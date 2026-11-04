@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>🎯 مسابقة المفرد والمثنى والجمع</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Comic Sans MS', 'Tahoma', sans-serif; }
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #a1c4fd 100%);
+  overflow-x: hidden;
+  padding: 20px;
+  position: relative;
+}
+.container { max-width: 1100px; margin: auto; position: relative; z-index: 2; }
+h1 {
+  text-align: center;
+  color: #fff;
+  font-size: 2.5em;
+  text-shadow: 3px 3px 0 #ff6b9d, 6px 6px 10px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.screen { display: none; animation: fadeIn 0.5s; }
+.screen.active { display: block; }
+@keyframes fadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+
+.name-box {
+  background: #fff;
+  border-radius: 30px;
+  padding: 40px;
+  max-width: 500px;
+  margin: 40px auto;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  text-align: center;
+  border: 5px dashed #ff6b9d;
+}
+.name-box h2 { color: #ff6b9d; font-size: 2em; margin-bottom: 20px; }
+.name-box p { color: #666; font-size: 1.2em; margin-bottom: 20px; }
+.name-box input {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.5em;
+  border: 3px solid #4ecdc4;
+  border-radius: 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  outline: none;
+}
+.name-box input:focus { border-color: #ff6b9d; }
+.btn {
+  background: linear-gradient(45deg, #ff6b9d, #ffa07a);
+  color: #fff;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.3em;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255,107,157,0.4);
+  transition: all 0.3s;
+  font-weight: bold;
+}
+.btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(255,107,157,0.6); }
+.btn.blue { background: linear-gradient(45deg, #4ecdc4, #44a3aa); box-shadow: 0 5px 15px rgba(78,205,196,0.4); }
+.btn.green { background: linear-gradient(45deg, #56ab2f, #a8e063); }
+.btn.purple { background: linear-gradient(45deg, #a18cd1, #fbc2eb); }
+
+.grid-info {
+  text-align: center;
+  color: #fff;
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+.cell {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #fff, #ffe0b2);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #ff6b9d;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  transition: all 0.3s;
+  border: 4px solid #fff;
+  position: relative;
+  overflow: hidden;
+}
+.cell:hover {
+  transform: scale(1.1) rotate(-3deg);
+  background: linear-gradient(135deg, #ffd1dc, #ffb3ba);
+}
+.cell.used {
+  background: linear-gradient(135deg, #a8e063, #56ab2f);
+  color: #fff;
+  cursor: not-allowed;
+}
+.cell.used::after {
+  content: "✓";
+  position: absolute;
+  font-size: 1.5em;
+  top: 5px;
+  left: 5px;
+}
+
+.question-box {
+  background: #fff;
+  border-radius: 30px;
+  padding: 40px;
+  max-width: 700px;
+  margin: 30px auto;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  text-align: center;
+  border: 5px solid #4ecdc4;
+}
+.question-box h2 { color: #4ecdc4; margin-bottom: 15px; font-size: 1.8em; }
+.question-text {
+  font-size: 1.8em;
+  color: #333;
+  margin: 25px 0;
+  padding: 20px;
+  background: #fff8e1;
+  border-radius: 20px;
+  border: 3px dashed #ffa07a;
+}
+.options { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.option {
+  background: linear-gradient(45deg, #a18cd1, #fbc2eb);
+  color: #fff;
+  padding: 20px;
+  font-size: 1.5em;
+  border-radius: 20px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+.option:hover { transform: scale(1.03); background: linear-gradient(45deg, #fbc2eb, #a18cd1); }
+.option.correct { background: linear-gradient(45deg, #56ab2f, #a8e063); animation: pulse 0.5s; }
+.option.wrong { background: linear-gradient(45deg, #ff6b6b, #ee5a6f); animation: shake 0.5s; }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }
+@keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-10px);} 75%{transform:translateX(10px);} }
+
+.celebration-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 90;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.celebration-overlay.show { display: flex; }
+
+.result-box {
+  background: #fff;
+  border-radius: 30px;
+  padding: 40px;
+  max-width: 550px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  animation: popIn 0.6s cubic-bezier(0.68,-0.55,0.265,1.55);
+  position: relative;
+  overflow: hidden;
+}
+@keyframes popIn { from {transform:scale(0) rotate(-180deg);} to {transform:scale(1) rotate(0);} }
+.result-box.success { 
+  border: 6px solid #56ab2f; 
+  background: linear-gradient(135deg, #fff, #e8f5e9);
+}
+.result-box.try-again { 
+  border: 6px solid #ff9800; 
+  background: linear-gradient(135deg, #fff, #fff3e0);
+}
+.result-emoji { font-size: 5em; margin-bottom: 15px; animation: bounce 1s infinite; }
+.result-title {
+  font-size: 2.2em;
+  color: #ff6b9d;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-shadow: 2px 2px 0 #fff;
+}
+.result-text { font-size: 1.5em; color: #333; margin: 15px 0; font-weight: bold; }
+.student-name {
+  display: inline-block;
+  background: linear-gradient(45deg, #ff6b9d, #ffa07a);
+  color: #fff;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 1.4em;
+  font-weight: bold;
+  margin: 10px 0;
+  box-shadow: 0 5px 15px rgba(255,107,157,0.4);
+  animation: glow 1.5s infinite alternate;
+}
+@keyframes glow {
+  from { box-shadow: 0 5px 15px rgba(255,107,157,0.4); }
+  to { box-shadow: 0 5px 25px rgba(255,107,157,0.8); }
+}
+.btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap; }
+
+.confetti {
+  position: fixed;
+  width: 15px; height: 15px;
+  top: -20px;
+  z-index: 95;
+  animation: fall 3s linear;
+  pointer-events: none;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(720deg); }
+}
+
+.balloon {
+  position: fixed;
+  bottom: -100px;
+  font-size: 3em;
+  z-index: 94;
+  animation: floatUp 4s ease-out;
+  pointer-events: none;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(-110vh) rotate(20deg); opacity: 0.7; }
+}
+
+.firework {
+  position: fixed;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  z-index: 93;
+  animation: explode 1.5s ease-out;
+  pointer-events: none;
+}
+@keyframes explode {
+  0% { transform: scale(0); opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+  50% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 10px currentColor, 0 0 0 20px currentColor, 0 0 0 30px currentColor; }
+  100% { transform: scale(1.5); opacity: 0; box-shadow: 0 0 0 40px currentColor, 0 0 0 60px currentColor; }
+}
+
+.sparkle {
+  position: fixed;
+  font-size: 2em;
+  z-index: 96;
+  animation: sparkleAnim 2s ease-out;
+  pointer-events: none;
+}
+@keyframes sparkleAnim {
+  0% { transform: scale(0) rotate(0); opacity: 0; }
+  50% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+.emoji-float {
+  position: fixed;
+  font-size: 3em;
+  z-index: 94;
+  animation: emojiFloat 3s ease-out;
+  pointer-events: none;
+}
+@keyframes emojiFloat {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  20% { transform: translateY(-50px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-200px) scale(0.5); opacity: 0; }
+}
+
+.back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: #fff;
+  color: #ff6b9d;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 3px solid #ff6b9d;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
+  z-index: 50;
+}
+.back-btn:hover { background: #ff6b9d; color: #fff; }
+
+@media (max-width: 600px) {
+  .grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .cell { font-size: 1.8em; }
+  h1 { font-size: 1.8em; }
+  .question-text { font-size: 1.3em; }
+  .result-title { font-size: 1.6em; }
+  .result-text { font-size: 1.2em; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎯 مسابقة المفرد والمثنى والجمع 🌟</h1>
+
+  <div id="nameScreen" class="screen active">
+    <div class="name-box">
+      <h2>👋 مرحباً يا بطل!</h2>
+      <p>اكتب اسمك لتحصل على سؤالك 🎁</p>
+      <input type="text" id="studentName" placeholder="اسمك هنا..." maxlength="20">
+      <br>
+      <button class="btn" onclick="startGame()">🚀 ابدأ</button>
+    </div>
+  </div>
+
+  <div id="gridScreen" class="screen">
+    <div class="grid-info">🎈 أهلاً <span id="displayName" style="color:#ffd700; font-weight:bold;"></span>! اختر رقماً 🎈</div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="questionScreen" class="screen">
+    <button class="back-btn" onclick="backToName()">⬅️ طالب جديد</button>
+    <div class="question-box">
+      <h2>📝 السؤال</h2>
+      <div class="question-text" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+    </div>
+  </div>
+</div>
+
+<div id="celebrationOverlay" class="celebration-overlay">
+  <div class="result-box" id="resultBox">
+    <div class="result-emoji" id="resEmoji">🎉</div>
+    <div class="result-title" id="resTitle"></div>
+    <div class="student-name" id="resName"></div>
+    <div class="result-text" id="resText"></div>
+    <div class="btn-group">
+      <button class="btn green" onclick="nextStudent()">👥 طالب جديد</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {q:"كلمة (قلم) هي:", options:["مفرد","مثنى","جمع"], correct:0},
+  {q:"كلمة (قلمان) هي:", options:["مفرد","مثنى","جمع"], correct:1},
+  {q:"كلمة (أقلام) هي:", options:["مفرد","مثنى","جمع"], correct:2},
+  {q:"ما مثنى كلمة (كتاب)؟", options:["كتب","كتابان","كتابات"], correct:1},
+  {q:"ما جمع كلمة (طالب)؟", options:["طالبان","طلاب","طالبون"], correct:1},
+  {q:"(وردة) كلمة:", options:["مفردة","مثنى","جمع"], correct:0},
+  {q:"(وردتان) كلمة:", options:["مفردة","مثنى","جمع"], correct:1},
+  {q:"(ورود) كلمة:", options:["مفردة","مثنى","جمع"], correct:2},
+  {q:"ما مثنى (معلمة)؟", options:["معلمات","معلمتان","مُعَلِّمون"], correct:1},
+  {q:"ما جمع كلمة (كتاب)؟", options:["كتابان","كُتُب","كتابات"], correct:1},
+  {q:"(تفاحتان) هي كلمة:", options:["مفردة","مثنى","جمع"], correct:1},
+  {q:"(تفاحات) هي كلمة:", options:["مفردة","مثنى","جمع"], correct:2},
+  {q:"ما مثنى (ولد)؟", options:["أولاد","ولدان","وليد"], correct:1},
+  {q:"ما جمع (قلم)؟", options:["قلمان","أقلام","قلمات"], correct:1},
+  {q:"(شجرة) كلمة:", options:["مفردة","مثنى","جمع"], correct:0},
+  {q:"(شجرتان) كلمة:", options:["مفردة","مثنى","جمع"], correct:1},
+  {q:"(أشجار) كلمة:", options:["مفردة","مثنى","جمع"], correct:2},
+  {q:"(عصفوران) هي كلمة:", options:["مفردة","مثنى","جمع"], correct:1},
+  {q:"(عصافير) هي كلمة:", options:["مفردة","مثنى","جمع"], correct:2},
+  {q:"(عصفور) هي كلمة:", options:["مفردة","مثنى","جمع"], correct:0}
+];
+
+let studentName = "";
+let currentQ = 0;
+let usedQuestions = [];
+let usedCells = []; 
+let lastCellIndex = -1;
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(freq, duration, type='sine', volume=0.3) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+function playSuccess() {
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((n, i) => setTimeout(() => playTone(n, 0.3, 'triangle', 0.25), i*120));
+  setTimeout(() => playTone(1047, 0.5, 'sine', 0.3), 500);
+  setTimeout(() => playTone(200, 0.1, 'sawtooth', 0.15), 700);
+  setTimeout(() => playTone(300, 0.1, 'sawtooth', 0.15), 900);
+}
+function playTryAgain() {
+  playTone(392, 0.2, 'sine', 0.2);
+  setTimeout(() => playTone(440, 0.3, 'sine', 0.2), 200);
+}
+function playClick() { playTone(800, 0.05, 'square', 0.1); }
+
+function startGame() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name) { alert('اكتب اسمك أولاً يا بطل! 🌟'); return; }
+  studentName = name;
+  document.getElementById('displayName').textContent = name;
+  showScreen('gridScreen');
+  buildGrid();
+  playClick();
+}
+
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 20; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (usedCells.includes(i) ? ' used' : '');
+    cell.textContent = i + 1;
+    cell.onclick = () => pickCell(i, cell);
+    grid.appendChild(cell);
+  }
+}
+
+function pickCell(index, cell) {
+  if (cell.classList.contains('used')) return;
+  lastCellIndex = index;
+  let available = [];
+  for (let i = 0; i < questions.length; i++) {
+    if (!usedQuestions.includes(i)) available.push(i);
+  }
+  if (available.length === 0) { usedQuestions = []; available = questions.map((_,i)=>i); }
+  currentQ = available[Math.floor(Math.random() * available.length)];
+  usedQuestions.push(currentQ);
+  showQuestion();
+  playClick();
+}
+
+function showQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('qText').textContent = q.q;
+  const opts = document.getElementById('qOptions');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(i, btn);
+    opts.appendChild(btn);
+  });
+  showScreen('questionScreen');
+}
+
+function checkAnswer(selected, btn) {
+  const q = questions[currentQ];
+  const allBtns = document.querySelectorAll('.option');
+  allBtns.forEach(b => b.onclick = null);
+  
+  if (selected === q.correct) {
+    btn.classList.add('correct');
+    setTimeout(() => showResult(true), 600);
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.correct].classList.add('correct');
+    setTimeout(() => showResult(false), 1000);
+  }
+}
+
+function showResult(success) {
+  const overlay = document.getElementById('celebrationOverlay');
+  const box = document.getElementById('resultBox');
+  const emoji = document.getElementById('resEmoji');
+  const title = document.getElementById('resTitle');
+  const text = document.getElementById('resText');
+  const name = document.getElementById('resName');
+  
+  name.textContent = `🌟 ${studentName} 🌟`;
+  
+  if (success) {
+    box.className = 'result-box success';
+    const titles = ["أحسنت!", "ممتاز!", "رائع جداً!", "بطل!", "عبقري!"];
+    const msgs = [
+      `إجابة رائعة يا ${studentName}! 🎉`,
+      `أنت نجم يا ${studentName}! ⭐`,
+      `أصبت يا ${studentName}! استمر! 🌟`,
+      `ممتاز يا ${studentName}! 🏆`,
+      `أنت بطل يا ${studentName}! 💪`
+    ];
+    emoji.textContent = ['🎉','🏆','⭐','🌟','🎊','🥳'][Math.floor(Math.random()*6)];
+    title.textContent = titles[Math.floor(Math.random()*titles.length)];
+    text.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+    playSuccess();
+    launchCelebration();
+    
+    if (lastCellIndex >= 0 && !usedCells.includes(lastCellIndex)) {
+      usedCells.push(lastCellIndex);
+    }
+  } else {
+    box.className = 'result-box try-again';
+    const titles = ["لا بأس!", "حاول مجدداً!", "أنت قادر!", "قريب!"];
+    const msgs = [
+      `لا بأس يا ${studentName}، حاول مرة أخرى 💪`,
+      `أنت قريب يا ${studentName}! 🌈`,
+      `لا تستسلم يا ${studentName}! ✨`,
+      `المحاولة تصنع النجاح يا ${studentName}! 🎈`
+    ];
+    emoji.textContent = ['💪','🌈','🤗','✨','🎈'][Math.floor(Math.random()*5)];
+    title.textContent = titles[Math.floor(Math.random()*titles.length)];
+    text.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+    playTryAgain();
+    launchGentleCelebration();
+  }
+  
+  overlay.classList.add('show');
+}
+
+function launchCelebration() {
+  launchConfetti();
+  launchBalloons();
+  launchFireworks();
+  launchSparkles();
+  launchEmojis();
+}
+
+function launchGentleCelebration() {
+  launchBalloons(5);
+  launchSparkles(5);
+}
+
+function launchConfetti() {
+  const colors = ['#ff6b9d','#4ecdc4','#ffd93d','#a18cd1','#ff9a76','#56ab2f','#ff4081','#00bcd4'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.background = colors[Math.floor(Math.random()*colors.length)];
+      c.style.animationDuration = (2 + Math.random()*2) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+      c.style.width = (8 + Math.random()*10) + 'px';
+      c.style.height = (8 + Math.random()*10) + 'px';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4500);
+    }, i * 30);
+  }
+}
+
+function launchBalloons(count = 12) {
+  const balloons = ['🎈','🎈','🎈','🎁','🎀'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const b = document.createElement('div');
+      b.className = 'balloon';
+      b.textContent = balloons[Math.floor(Math.random()*balloons.length)];
+      b.style.left = Math.random() * 100 + 'vw';
+      b.style.animationDuration = (3 + Math.random()*2) + 's';
+      b.style.filter = `hue-rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), 5000);
+    }, i * 200);
+  }
+}
+
+function launchFireworks() {
+  const colors = ['#ff006e','#fb5607','#ffbe0b','#8338ec','#3a86ff','#06ffa5'];
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const f = document.createElement('div');
+      f.className = 'firework';
+      f.style.left = (10 + Math.random()*80) + 'vw';
+      f.style.top = (10 + Math.random()*60) + 'vh';
+      const color = colors[Math.floor(Math.random()*colors.length)];
+      f.style.background = color;
+      f.style.color = color;
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 1500);
+    }, i * 300);
+  }
+}
+
+function launchSparkles(count = 15) {
+  const sparkles = ['✨','⭐','🌟','💫'];
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.textContent = sparkles[Math.floor(Math.random()*sparkles.length)];
+      s.style.left = Math.random() * 100 + 'vw';
+      s.style.top = Math.random() * 100 + 'vh';
+      s.style.animationDuration = (1.5 + Math.random()) + 's';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 2500);
+    }, i * 150);
+  }
+}
+
+function launchEmojis() {
+  const emojis = ['🎉','🎊','🥳','🏆','🎁','🎀','🌈','💖','🦄','🍭'];
+  for (let i = 0; i < 10; i++) {
+    setTimeout(() => {
+      const e = document.createElement('div');
+      e.className = 'emoji-float';
+      e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      e.style.left = Math.random() * 90 + 5 + 'vw';
+      e.style.top = (60 + Math.random()*30) + 'vh';
+      document.body.appendChild(e);
+      setTimeout(() => e.remove(), 3000);
+    }, i * 200);
+  }
+}
+
+function nextStudent() {
+  document.getElementById('celebrationOverlay').classList.remove('show');
+  document.getElementById('studentName').value = '';
+  showScreen('nameScreen');
+  buildGrid();
+  playClick();
+}
+
+function backToName() {
+  document.getElementById('studentName').value = '';
+  showScreen('nameScreen');
+  buildGrid();
+  playClick();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>
